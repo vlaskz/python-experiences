@@ -4,9 +4,6 @@ from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.chrome.options import Options
 import json
 
-# with open('data.json') as json_file:
-#   data = json.load(json_file)
-
 #ciclo do programa:
     #mostrar texto de apresentação
     #inicializar o driver
@@ -16,6 +13,7 @@ import json
         #se for via data.json, fazer uma pesquisa para cada registro
     #exibir os registros armazenados
 #sair
+
 def presentation():
 
     print('\033[H\033[J\033[1;34;40m')
@@ -40,9 +38,17 @@ def connect(driver):
     submitButton       = driver.find_element_by_id('pesquisa02_0')
     return searchString, searchInAllPapers, startDate, endDate, submitButton
 
-
+def loadJson():
+    with open('data.json', 'r') as data:
+        return json.load(data)
+ 
 def loadData():
     userInput = input('\n  --> Pressione <ENTER> para buscar por data.json\nOu digite o termo de busca:\033[1;36;40m ')
+    if not userInput:
+        userInput = loadJson()
+        print(json.dumps(userInput, indent=4, sort_keys=True))
+        quit()
+
     return userInput
 
 
