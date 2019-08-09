@@ -33,20 +33,20 @@ def initialize():
 def connect(driver):
     print('  --> Conectando')
     driver.get('http://pesquisa.in.gov.br/imprensa/core/start.action')
-    searchString               = driver.find_element_by_name('edicao.txtPesquisa')
-    searchInAllPapers    = driver.find_element_by_id('chk_avancada_0')
-    startDate                  = driver.find_element_by_name('edicao.dtInicio')
-    endDate                     = driver.find_element_by_id('dt_fim_avancada')
-    submitButton                 = driver.find_element_by_id('pesquisa02_0')
-    return  searchString, searchInAllPapers, startDate, endDate, submitButton)
+    searchString       = driver.find_element_by_name('edicao.txtPesquisa')
+    searchInAllPapers  = driver.find_element_by_id('chk_avancada_0')
+    startDate          = driver.find_element_by_name('edicao.dtInicio')
+    endDate            = driver.find_element_by_id('dt_fim_avancada')
+    submitButton       = driver.find_element_by_id('pesquisa02_0')
+    return searchString, searchInAllPapers, startDate, endDate, submitButton
 
 
 def loadData():
-    userInput = input('\033[1;32;40m --> Pressione <ENTER> para buscar por data.json\nOu digite o termo de busca: ')
+    userInput = input('\n  --> Pressione <ENTER> para buscar por data.json\nOu digite o termo de busca:\033[1;36;40m ')
     return userInput
 
 
-def setOptions  searchString, searchInAllPapers, startDate):
+def setOptions(searchString, searchInAllPapers, startDate):
     searchString.send_keys(loadData())
     searchInAllPapers.click()
 
@@ -66,22 +66,19 @@ def submit(submitButton):
     print('\n\033[1;33;40m  --> Submetendo')
     submitButton.click()
 
-
+#actually program starts here
 presentation()
-driver = initialize()   searchString, searchInAllPapers, startDate, endDate, submitButton = connect(
-    driver)
-setOptions  searchString, searchInAllPapers, startDate)
+driver = initialize()   
+searchString, searchInAllPapers, startDate, endDate, submitButton = connect(driver)
+setOptions(searchString, searchInAllPapers, startDate)
 submit(submitButton)
 
 
 print('  --> Processando')
 allLinks = driver.find_elements_by_class_name('titulo_jornal')
-print('\033[1;33;40m---------------------------------------------------------\033[1;32;40m\n')
-print('    ', len(allLinks), ' registro(s) encontrado(s):\n')
+print('\033[1;33;40m..........................................................................\n')
+print('Últimos ', len(allLinks), ' registro(s) encontrado(s):\n')
 for link in allLinks:
-    print('   ', link.get_attribute('text'))
-    print('     >>>', link.get_attribute('href'), '\n')
-    print(
-        '\033[1;33;40m---------------------------------------------------------\033[1;32;40m')
+    print('\033[1;32;40m[', allLinks.index(link),']', link.get_attribute('text'))
 print('\033[1;33;40m  --> Concluído\n')
 driver.quit()
