@@ -17,14 +17,16 @@ import json
 
 def presentation():
     print('\033[H\033[J\033[1;34;40m')
-    print('Bot para Pesquisa ao Diário Oficial da União 2019\nDesenvolvido por Vlaskz(https://github.com/vlaskz)\nDisponível em https://github.com/vlaskz/python-experiences/autofill\n')
+    print('Bot para Pesquisa ao Diário Oficial da União 2019\n\
+        Desenvolvido por Vlaskz(https: // github.com / vlaskz)\n\
+            Disponível em https://github.com/vlaskz/python-experiences/autofill\n')
 
 
 def initialize():
     print('\033[1;33;40m', ' --> Inicializando')
     chrome_opt = Options()
     chrome_opt.add_argument('--headless')
-    webDriver = webdriver.Chrome('C:\\sel\\chromedriver.exe', 0)
+    webDriver = webdriver.Chrome('C:\\sel\\chromedriver.exe', 0, chrome_opt)
     return webDriver
 
 
@@ -83,13 +85,15 @@ def fetchResults(webDriver):
         morePages = webDriver.find_elements_by_partial_link_text('Próximo')
         results = webDriver.find_elements_by_css_selector('a.titulo_jornal')
         for result in results:
-            print(result.get_attribute('text').rstrip(), '\n')
+            print('\n\033[1;32;40m', result.get_attribute('text').strip(), '\n',
+                  result.get_attribute('href').strip(), '\n',)
         if not results:
             print('\n\033[1;31;40m', '  --> Nenhum registro encontrado\n')
             quit()
         if not morePages:
             for result in results:
                 print(result.get_attribute('text').rstrip(), '\n')
+            break
         morePages[0].click()
 
 
