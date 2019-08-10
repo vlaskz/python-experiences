@@ -17,25 +17,25 @@ import json
 
 def presentation():
     print('\033[H\033[J\033[1;34;40m')
-    print('Bot para Pesquisa ao Diário Oficial da União 2019\nDesenvolvido por Vlaskz(https://github.com/vlaskz)\n')
+    print('Bot para Pesquisa ao Diário Oficial da União 2019\nDesenvolvido por Vlaskz(https://github.com/vlaskz)\nDisponível em https://github.com/vlaskz/python-experiences/autofill\n')
 
 
 def initialize():
-    print('\033[1;33;40m  --> Inicializando')
+    print('\033[1;33;40m', ' --> Inicializando')
     chrome_opt = Options()
     chrome_opt.add_argument('--headless')
-    driver = webdriver.Chrome('C:\\sel\\chromedriver.exe', 0, chrome_opt)
-    return driver
+    webDriver = webdriver.Chrome('C:\\sel\\chromedriver.exe', 0)
+    return webDriver
 
 
-def connect(driver):
-    print('  --> Conectando')
-    driver.get('http://pesquisa.in.gov.br/imprensa/core/start.action')
-    searchString = driver.find_element_by_name('edicao.txtPesquisa')
-    searchInAllPapers = driver.find_element_by_id('chk_avancada_0')
-    startDate = driver.find_element_by_name('edicao.dtInicio')
-    endDate = driver.find_element_by_id('dt_fim_avancada')
-    submitButton = driver.find_element_by_id('pesquisa02_0')
+def connect(webDriver):
+    print('  --> Conectando\n')
+    webDriver.get('http://pesquisa.in.gov.br/imprensa/core/start.action')
+    searchString = webDriver.find_element_by_name('edicao.txtPesquisa')
+    searchInAllPapers = webDriver.find_element_by_id('chk_avancada_0')
+    startDate = webDriver.find_element_by_name('edicao.dtInicio')
+    endDate = webDriver.find_element_by_id('dt_fim_avancada')
+    submitButton = webDriver.find_element_by_id('pesquisa02_0')
     return searchString, searchInAllPapers, startDate, endDate, submitButton
 
 
@@ -46,7 +46,7 @@ def loadJson():
 
 def loadData():
     userInput = input(
-        '\n  --> Pressione <ENTER> para buscar por data.json\n  ou digite o termo de busca:\033[1;36;40m ')
+        '  --> Pressione <ENTER> para buscar por data.json\n  ou digite o termo de busca:\033[1;36;40m ')
     if not userInput or userInput.strip() == '':
         userInput = loadJson()
         print(json.dumps(userInput, indent=4, sort_keys=True))
@@ -72,30 +72,38 @@ def setOptions(searchString, searchInAllPapers, startDate):
 
 
 def submit(submitButton):
-    print('\n\033[1;33;40m  --> Submetendo')
+    print('\n\033[1;33;40m', '  --> Submetendo')
     submitButton.click()
 
 
-# actually program starts here
-presentation()
-driver = initialize()
-searchString, searchInAllPapers, startDate, endDate, submitButton = connect(
-    driver)
-setOptions(searchString, searchInAllPapers, startDate)
-submit(submitButton)
+def fetchResults(webDriver):
+    print('  --> Obtendo Resultados')
+    results = []
+    while True:
+        morePages = webDriver.find_elements_by_partial_link_text('Próximo')
+        results = webDriver.find_elements_by_css_selector('a.titulo_jornal')
+        for result in results:
+            print(result.get_attribute('text').rstrip(), '\n')
+        if not results:
+            print('\n\033[1;31;40m', '  --> Nenhum registro encontrado\n')
+            quit()
+        if not morePages:
+            for result in results:
+                print(result.get_attribute('text').rstrip(), '\n')
+        morePages[0].click()
 
 
-print('  --> Processando')
-allLinks = driver.find_elements_by_class_name('titulo_jornal')
+def main():
+    presentation()
+    webDriver = initialize()
+    searchString, searchInAllPapers, startDate, endDate, submitButton = connect(
+        webDriver)
+    setOptions(searchString, searchInAllPapers, startDate)
+    submit(submitButton)
+    fetchResults(webDriver)
+    print('\033[1;33;40m  --> Concluído\n')
+    webDriver.quit()
 
-if(allLinks[0].get_attribute('text') != 'None'):
-    print('\033[1;33;40m..........................................................................\n')
-    print('Últimos ', len(allLinks), ' registro(s) encontrado(s):\n')
-    for link in allLinks:
-        print('\033[1;32;40m[', allLinks.index(link), ']',
-              link.get_attribute('text').rstrip(), '\n', link.get_attribute('href'), '\n')
-else:
-    print('\n\033[1;31;40m  --> Nenhum registro encontrado\n')
 
-print('\033[1;33;40m  --> Concluído\n')
-driver.quit()
+if __name__ == "__main__":
+    main()
