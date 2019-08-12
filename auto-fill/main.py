@@ -5,13 +5,13 @@ from selenium.webdriver.chrome.options import Options
 import json
 
 # ciclo do programa:
-# mostrar texto de apresentação
-# inicializar o driver
-# conectar ao site e obter os objetos
-# carregar os dados do prompt ou do data.json
-# se for via prompt, executar e sair
-# se for via data.json, fazer uma pesquisa para cada registro
-# exibir os registros armazenados
+# mostrar texto de apresentação - OK
+# inicializar o driver - OK
+# conectar ao site e obter os objetos - OK
+# carregar os dados do prompt ou do data.json - IN PROCESS
+# se for via prompt, executar e sair - OK
+# se for via data.json, fazer uma pesquisa para cada registro - IN PROCESS
+# exibir os registros encontrados - OK
 # sair
 
 
