@@ -1,8 +1,9 @@
-from datetime import datetime
-from selenium import webdriver
-from selenium.webdriver.common.keys import Keys
-from selenium.webdriver.chrome.options import Options
 import json
+
+from selenium import webdriver
+from selenium.webdriver.firefox.options import Options
+from selenium.webdriver.common.keys import Keys
+
 
 # ciclo do programa:
 # mostrar texto de apresentação - OK
@@ -16,28 +17,27 @@ import json
 
 
 def presentation():
-    print('\033[H\033[J\033[1;34;40m')
     print('Bot para Pesquisa ao Diário Oficial da União 2019\n\
         Desenvolvido por Vlaskz(https: // github.com / vlaskz)\n\
             Disponível em https://github.com/vlaskz/python-experiences/autofill\n')
 
 
 def initialize():
-    print('\033[1;33;40m', ' --> Inicializando')
-    chrome_opt = Options()
-    chrome_opt.add_argument('--headless')
-    webDriver = webdriver.Chrome('C:\\sel\\chromedriver.exe', 0, chrome_opt)
-    return webDriver
+    print(' --> Inicializando')
+    firefox_opt = Options()
+    firefox_opt.add_argument('--headless')
+    driver = webdriver.Firefox()
+    return driver
 
 
-def connect(webDriver):
+def connect(driver):
     print('  --> Conectando\n')
-    webDriver.get('http://pesquisa.in.gov.br/imprensa/core/start.action')
-    searchString = webDriver.find_element_by_name('edicao.txtPesquisa')
-    searchInAllPapers = webDriver.find_element_by_id('chk_avancada_0')
-    startDate = webDriver.find_element_by_name('edicao.dtInicio')
-    endDate = webDriver.find_element_by_id('dt_fim_avancada')
-    submitButton = webDriver.find_element_by_id('pesquisa02_0')
+    driver.get('http://pesquisa.in.gov.br/imprensa/core/start.action')
+    searchString = driver.find_element_by_name('edicao.txtPesquisa')
+    searchInAllPapers = driver.find_element_by_id('chk_avancada_0')
+    startDate = driver.find_element_by_name('edicao.dtInicio')
+    endDate = driver.find_element_by_id('dt_fim_avancada')
+    submitButton = driver.find_element_by_id('pesquisa02_0')
     return searchString, searchInAllPapers, startDate, endDate, submitButton
 
 
@@ -48,7 +48,7 @@ def loadJson():
 
 def loadData():
     userInput = input(
-        '  --> Pressione <ENTER> para buscar por data.json\n  ou digite o termo de busca:\033[1;36;40m ')
+        '  --> Pressione <ENTER> para buscar por data.json\n  ou digite o termo de busca:')
     if not userInput or userInput.strip() == '':
         userInput = loadJson()
         print(json.dumps(userInput, indent=4, sort_keys=True))
@@ -74,39 +74,37 @@ def setOptions(searchString, searchInAllPapers, startDate):
 
 
 def submit(submitButton):
-    print('\n\033[1;33;40m', '  --> Submetendo')
+    print('  --> Submetendo')
     submitButton.click()
 
 
-def fetchResults(webDriver):
+def fetchResults(driver):
     print('  --> Obtendo Resultados')
-    results = []
     while True:
-        morePages = webDriver.find_elements_by_partial_link_text('Próximo')
-        results = webDriver.find_elements_by_css_selector('a.titulo_jornal')
+        more_pages = driver.find_elements_by_partial_link_text('Próximo')
+        results = driver.find_elements_by_css_selector('a.titulo_jornal')
         for result in results:
-            print('\n\033[1;32;40m', result.get_attribute('text').strip(), '\n',
+            print(result.get_attribute('text').strip(), '\n',
                   result.get_attribute('href').strip(), '\n',)
         if not results:
-            print('\n\033[1;31;40m', '  --> Nenhum registro encontrado\n')
+            print('  --> Nenhum registro encontrado\n')
             quit()
-        if not morePages:
+        if not more_pages:
             for result in results:
                 print(result.get_attribute('text').rstrip(), '\n')
             break
-        morePages[0].click()
+        more_pages[0].click()
 
 
 def main():
     presentation()
-    webDriver = initialize()
-    searchString, searchInAllPapers, startDate, endDate, submitButton = connect(
-        webDriver)
+    driver = initialize()
+    searchString, searchInAllPapers, startDate, endDate, submitButton = connect(driver)
     setOptions(searchString, searchInAllPapers, startDate)
     submit(submitButton)
-    fetchResults(webDriver)
-    print('\033[1;33;40m  --> Concluído\n')
-    webDriver.quit()
+    fetchResults(driver)
+    print('--> Concluído\n')
+    driver.quit()
 
 
 if __name__ == "__main__":
